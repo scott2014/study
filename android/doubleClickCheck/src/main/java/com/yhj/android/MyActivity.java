@@ -5,11 +5,19 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 //onTouch方法中判断事件是单击还是双击还是移动
 
 public class MyActivity extends Activity {
-    private long
+    private long downTime;            //按下时间
+    private long upTime;              //弹起时间
+    private int currX;                //当前点击X坐标
+    private int currY;                //当前点击Y坐标
+    private int downX;                //按下时X坐标
+    private int downY;                //按下时Y坐标
+    private int upX;                  //弹起时X坐标
+    private int upY;                  //弹起时Y坐标
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,34 @@ public class MyActivity extends Activity {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+ /*       this.currX = (int)event.getRawX();
+        this.currY = (int)event.getRawY();*/
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                this.downX = (int)event.getRawX();
+                this.downY = (int)event.getRawY();
+                this.downTime = System.currentTimeMillis();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                break;
+            case MotionEvent.ACTION_UP:
+                this.upX = (int)event.getX();
+                this.upY = (int)event.getY();
+                this.upTime = System.currentTimeMillis();
+                if (upTime - downTime > 500 && (upX - downX) <= 5 && (upY - downY) <= 5) {
+                    Toast.makeText(MyActivity.this,"long click",Toast.LENGTH_LONG).show();
+                }
+                if (upTime - downTime < 300 && (upX - downX) <= 5 && (upY - downY) <= 5) {
+                    Toast.makeText(MyActivity.this,"short click",Toast.LENGTH_LONG).show();
+                }
+                this.downX = 0;
+                this.downY = 0;
+                this.currX = 0;
+                this.currY = 0;
+                this.downTime = 0;
+                this.upTime = 0;
+                break;
+        }
         return super.onTouchEvent(event);
     }
 }

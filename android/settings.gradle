@@ -1,1 +1,1 @@
-include ':app', ':doubleClickCheck'
+include ':app', ':doubleClickCheck', ':downloader'

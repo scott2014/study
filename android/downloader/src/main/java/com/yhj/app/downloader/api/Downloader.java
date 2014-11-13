@@ -22,17 +22,22 @@ public class Downloader {
     private static Downloader instance;
     private DownloadListener listener;
     private long completeSize;
+    private int taskCount;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             completeSize += msg.what;
-            listener.onDownload(fileSize,completeSize,"","");
+            listener.onDownload(fileSize,(int)((double)completeSize / taskCount),"","");
         }
     };
     private Handler mDownloadHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            listener
+            switch (msg.what) {
+                case DownloadConst.DOWNLOAD_BEGIN:
+                    listener.onGetFileSizeComplete(fileSize,"","");
+                    break;
+            }
         }
     };
 
@@ -48,7 +53,9 @@ public class Downloader {
         return instance;
     }
 
-    public void createTask(final long taskCount,final String url, final String path,String name, final DownloadListener listener) {
+    public void createTask(final int taskCount,final String url, final String path, final String name, final DownloadListener listener) {
+        this.listener = listener;
+        this.taskCount = taskCount;
         HandlerThread thread = new HandlerThread(url);
         thread.start();
         Handler handler = new Handler(thread.getLooper()) {
@@ -59,15 +66,21 @@ public class Downloader {
                 try {
                     HttpResponse response = client.execute(get);
                     fileSize = response.getEntity().getContentLength();
-                    listener.onGetFileSizeComplete(fileSize,"",response.getEntity().getContentType().getValue().split("/")[1]);
+                    //listener.onGetFileSizeComplete(fileSize,"",response.getEntity().getContentType().getValue().split("/")[1]);
+
+                    Message msgObj = new Message();
+                    msgObj.what = DownloadConst.GET_FILE_SIZE;
+                    mDownloadHandler.sendMessage(msgObj);
 
                     long range = fileSize / taskCount;
                     for (int i=0;i<taskCount;i++) {
-                        new DownloadTask(mHandler).execute(url, range * i + "", (range * (i + 1) - 1) + "", fileSize + "", "aaaa.apk",path);
+                   //     new DownloadTask(mHandler).execute(url, range * i + "", (range * (i + 1) - 1) + "", fileSize + "", "aaaa.apk",path);
+                        new DownloadThread(mHandler,url,range * i + "", (range * (i + 1) - 1) + "",fileSize + "",name,path).start();
                     }
+
                 } catch (IOException e) {
                     Log.e(Downloader.class.getCanonicalName(),e.getMessage() + "");
-                    listener.onDownloadFail(1,"","");
+                 //   listener.onDownloadFail(1,"","");
                 }
             }
         };

@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/doubleClickCheck" />
             <option value="$PROJECT_DIR$/downloader" />
+            <option value="$PROJECT_DIR$/popupmenu" />
           </set>
         </option>
       </GradleProjectSettings>

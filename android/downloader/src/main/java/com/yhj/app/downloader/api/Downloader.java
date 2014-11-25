@@ -14,6 +14,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 
 /**
  * Created by scott on 14-11-12.
@@ -54,6 +55,7 @@ public class Downloader {
     }
 
     public void createTask(final int taskCount,final String url, final String path, final String name, final DownloadListener listener) {
+        completeSize = 0;
         this.listener = listener;
         this.taskCount = taskCount;
         HandlerThread thread = new HandlerThread(url);
@@ -67,6 +69,7 @@ public class Downloader {
                     HttpResponse response = client.execute(get);
                     fileSize = response.getEntity().getContentLength();
                     //listener.onGetFileSizeComplete(fileSize,"",response.getEntity().getContentType().getValue().split("/")[1]);
+                    File file = new File(path + File.separator + name);
 
                     Message msgObj = new Message();
                     msgObj.what = DownloadConst.GET_FILE_SIZE;
@@ -75,7 +78,10 @@ public class Downloader {
                     long range = fileSize / taskCount;
                     for (int i=0;i<taskCount;i++) {
                    //     new DownloadTask(mHandler).execute(url, range * i + "", (range * (i + 1) - 1) + "", fileSize + "", "aaaa.apk",path);
-                        new DownloadThread(mHandler,url,range * i + "", (range * (i + 1) - 1) + "",fileSize + "",name,path).start();
+                        RandomAccessFile accessFile = new RandomAccessFile(file,"rwd");
+                        accessFile.setLength(fileSize);
+                        accessFile.seek(range * i);
+                        new DownloadThread(mHandler,url,range * i + "", (range * (i + 1) - 1) + "",fileSize + "",name,path,accessFile).start();
                     }
 
                 } catch (IOException e) {

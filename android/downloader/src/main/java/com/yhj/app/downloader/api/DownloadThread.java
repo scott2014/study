@@ -24,8 +24,9 @@ public class DownloadThread extends Thread {
     private String fileSize;
     private String fileName;
     private String path;
+    private RandomAccessFile accessFile;
 
-    public DownloadThread(Handler handler,String url,String startPos,String endPos,String fileSize,String fileName,String path) {
+    public DownloadThread(Handler handler,String url,String startPos,String endPos,String fileSize,String fileName,String path,RandomAccessFile accessFile) {
         mHandler = handler;
         this.url = url;
         this.startPos = startPos;
@@ -33,6 +34,7 @@ public class DownloadThread extends Thread {
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.path = path;
+        this.accessFile = accessFile;
     }
 
     @Override
@@ -44,8 +46,9 @@ public class DownloadThread extends Thread {
             InputStream is = response.getEntity().getContent();
             byte[] buffer = new byte[1024];
             int i = -1;
-            RandomAccessFile accessFile = new RandomAccessFile(new File(path + File.separator + fileName),"rwd");
-            accessFile.setLength(Long.parseLong(fileSize));
+       //     RandomAccessFile accessFile = new RandomAccessFile(new File(path + File.separator + fileName),"rwd");
+        //    accessFile.setLength(Long.parseLong(fileSize));
+        //    accessFile.seek(Long.parseLong(startPos));
             while ((i = (is.read(buffer))) != -1) {
                 accessFile.write(buffer,0,i);
                 Message msg = new Message();

@@ -2,11 +2,15 @@ package com.yhj.popupmenu;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionProvider;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -105,5 +109,22 @@ public class MainActivity extends Activity implements View.OnLongClickListener {
         Log.e("downY", downY + "");
         //}
         return true;
+    }
+
+
+    class MyActionProvider extends ActionProvider {
+        private ContextWrapper mContextWrapper;
+
+        public MyActionProvider(Context context) {
+            super(context);
+            this.mContextWrapper = (ContextWrapper) context;
+        }
+
+        @Override
+        public View onCreateActionView() {
+            LayoutInflater inflater = LayoutInflater.from(mContextWrapper);
+            View view = inflater.inflate(R.layout.menu_layout,null);
+            return null;
+        }
     }
 }

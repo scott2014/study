@@ -1,1 +1,1 @@
-include ':app', ':doubleClickCheck', ':downloader', ':popupmenu', ':myactionprovider'
+include ':app', ':doubleClickCheck', ':downloader', ':popupmenu', ':myactionprovider', ':ontouchevent', ':oneventdispatch', ':imageoperate'

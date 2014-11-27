@@ -11,7 +11,10 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/doubleClickCheck" />
             <option value="$PROJECT_DIR$/downloader" />
+            <option value="$PROJECT_DIR$/imageoperate" />
             <option value="$PROJECT_DIR$/myactionprovider" />
+            <option value="$PROJECT_DIR$/oneventdispatch" />
+            <option value="$PROJECT_DIR$/ontouchevent" />
             <option value="$PROJECT_DIR$/popupmenu" />
           </set>
         </option>

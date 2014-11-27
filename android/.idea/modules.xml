@@ -6,7 +6,10 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/doubleClickCheck/doubleClickCheck.iml" filepath="$PROJECT_DIR$/doubleClickCheck/doubleClickCheck.iml" />
       <module fileurl="file://$PROJECT_DIR$/downloader/downloader.iml" filepath="$PROJECT_DIR$/downloader/downloader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/imageoperate/imageoperate.iml" filepath="$PROJECT_DIR$/imageoperate/imageoperate.iml" />
       <module fileurl="file://$PROJECT_DIR$/myactionprovider/myactionprovider.iml" filepath="$PROJECT_DIR$/myactionprovider/myactionprovider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/oneventdispatch/oneventdispatch.iml" filepath="$PROJECT_DIR$/oneventdispatch/oneventdispatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ontouchevent/ontouchevent.iml" filepath="$PROJECT_DIR$/ontouchevent/ontouchevent.iml" />
       <module fileurl="file://$PROJECT_DIR$/popupmenu/popupmenu.iml" filepath="$PROJECT_DIR$/popupmenu/popupmenu.iml" />
     </modules>
   </component>

@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
@@ -17,7 +18,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * Created by scott on 14-11-12.
+ * @author scott
+ * 下载任务类,主要负责拉起多线程,完成下载任务.同时通知监听器数据变化
+ *
  */
 public class Downloader {
     private static Downloader instance;
@@ -54,7 +57,16 @@ public class Downloader {
         return instance;
     }
 
-    public void createTask(final int taskCount,final String url, final String path, final String name, final DownloadListener listener) {
+    public void createTask(final int taskCount,final String url, final String name, final DownloadListener listener) {
+        //获取文件名称和文件类型
+        String fileName = getFileName(url);
+        String fileType = getFileType(url);
+
+        if (!checkSdcardMountStatus()) {
+            listener.onDownloadFail(DownloadConst.SDCARD_NOT_MOUNTED,fileName,fileType);
+            return;
+        }
+
         completeSize = 0;
         this.listener = listener;
         this.taskCount = taskCount;
@@ -68,30 +80,90 @@ public class Downloader {
                 try {
                     HttpResponse response = client.execute(get);
                     fileSize = response.getEntity().getContentLength();
-                    //listener.onGetFileSizeComplete(fileSize,"",response.getEntity().getContentType().getValue().split("/")[1]);
-                    File file = new File(path + File.separator + name);
 
+                    //1\获取文件尺寸完成
                     Message msgObj = new Message();
                     msgObj.what = DownloadConst.GET_FILE_SIZE;
                     mDownloadHandler.sendMessage(msgObj);
 
+                    //2\开始分段下载
+                    File file = new File(getSdCardPath() + File.separator + name);
+                    //创建文件失败
+                    if (!createFile(file)) {
+                        Message msgObj0 = new Message();
+                        msgObj0.what = DownloadConst.CREATE_FILE_FAIL;
+                        mHandler.sendMessage(msgObj0);
+                        return;
+                    }
+
                     long range = fileSize / taskCount;
                     for (int i=0;i<taskCount;i++) {
-                   //     new DownloadTask(mHandler).execute(url, range * i + "", (range * (i + 1) - 1) + "", fileSize + "", "aaaa.apk",path);
-                        RandomAccessFile accessFile = new RandomAccessFile(file,"rwd");
-                        accessFile.setLength(fileSize);
-                        accessFile.seek(range * i);
-                        new DownloadThread(mHandler,url,range * i + "", (range * (i + 1) - 1) + "",fileSize + "",name,path,accessFile).start();
+                        new DownloadThread(mHandler,url,range*i,range*(i+1)-1,fileSize,file).start();
                     }
 
                 } catch (IOException e) {
                     Log.e(Downloader.class.getCanonicalName(),e.getMessage() + "");
-                 //   listener.onDownloadFail(1,"","");
+                    Message msgObj = new Message();
+                    msgObj.what = DownloadConst.DOWNLOAD_FAIL;
+                    mDownloadHandler.sendMessage(msgObj);
                 }
             }
         };
         handler.sendEmptyMessage(0);
     }
 
+   //检测内存卡是否存在
+    private boolean checkSdcardMountStatus() {
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+    }
 
+    //通过url获取文件名称
+    private String getFileName(String url) {
+        if (TextUtils.isEmpty(url)) {
+            return null;
+        }
+        int index = url.lastIndexOf("/");
+        if (index == -1) {
+            return null;
+        } else {
+            return url.substring(index + 1);
+        }
+    }
+
+    //通过url获取文件类型
+    private String getFileType(String url) {
+        String fileName = getFileName(url);
+        if (!TextUtils.isEmpty(fileName)) {
+            int index = fileName.lastIndexOf(".");
+            if (index == -1) return null;
+            return fileName.substring(index + 1);
+        } else {
+            return null;
+        }
+    }
+
+    //获取SDCARD路径
+    private String getSdCardPath() {
+        if (checkSdcardMountStatus()) {
+            return Environment.getExternalStorageDirectory().getAbsolutePath();
+        }
+        return null;
+    }
+
+    //创建文件
+    private boolean createFile(File file) {
+        File parent = new File(file.getParent());
+        try {
+            if (!parent.exists()) {
+                parent.mkdirs();
+                file.createNewFile();
+            } else {
+                file.createNewFile();
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

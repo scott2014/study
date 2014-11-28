@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements DownloadListener {
         this.mDownloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Downloader.get().createTask(5,mAddressEdit.getText().toString(),getFilePath(),"aaaa.apk",MainActivity.this);
+                Downloader.get().createTask(5,mAddressEdit.getText().toString(),"aaa.apk",MainActivity.this);
             }
         });
     }

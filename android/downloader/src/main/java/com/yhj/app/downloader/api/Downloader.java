@@ -27,19 +27,18 @@ public class Downloader {
     private DownloadListener listener;
     private long completeSize;
     private int taskCount;
-    private Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            completeSize += msg.what;
-            listener.onDownload(fileSize,(int)((double)completeSize / taskCount),"","");
-        }
-    };
+    private String fileName;
+    private String fileType;
+
     private Handler mDownloadHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case DownloadConst.DOWNLOAD_BEGIN:
-                    listener.onGetFileSizeComplete(fileSize,"","");
+                case DownloadConst.GET_FILE_SIZE:
+                    listener.onGetFileSizeComplete(fileSize,fileName,fileType);
+                    break;
+                case DownloadConst.DOWNLOADING:
+                    listener.onDownload(fileSize,completeSize,fileName,fileType);
                     break;
             }
         }
@@ -51,16 +50,18 @@ public class Downloader {
     private Downloader() {}
 
     public static Downloader get() {
-        if (instance == null) {
+        /*if (instance == null) {
             instance = new Downloader();
-        }
-        return instance;
+        }*/
+        return new Downloader();
     }
 
     public void createTask(final int taskCount,final String url, final String name, final DownloadListener listener) {
         //获取文件名称和文件类型
         String fileName = getFileName(url);
         String fileType = getFileType(url);
+        this.fileName = fileName;
+        this.fileType = fileType;
 
         if (!checkSdcardMountStatus()) {
             listener.onDownloadFail(DownloadConst.SDCARD_NOT_MOUNTED,fileName,fileType);
@@ -92,13 +93,20 @@ public class Downloader {
                     if (!createFile(file)) {
                         Message msgObj0 = new Message();
                         msgObj0.what = DownloadConst.CREATE_FILE_FAIL;
-                        mHandler.sendMessage(msgObj0);
+                        mDownloadHandler.sendMessage(msgObj0);
                         return;
                     }
 
                     long range = fileSize / taskCount;
                     for (int i=0;i<taskCount;i++) {
-                        new DownloadThread(mHandler,url,range*i,range*(i+1)-1,fileSize,file).start();
+                        long startPos = range * i;
+                        long endPos;
+                        if (i == taskCount - 1) {
+                            endPos = fileSize;
+                        } else {
+                            endPos = range * (i + 1) - 1;
+                        }
+                        new DownloadThread(mDownloadHandler,url,startPos,endPos,fileSize,file,Downloader.this).start();
                     }
 
                 } catch (IOException e) {
@@ -164,6 +172,14 @@ public class Downloader {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    //下载尺寸
+    public synchronized void append(long size) {
+        completeSize += size;
+        if (completeSize == fileSize) {
+            listener.onDownloadComplete(fileName,fileType);
         }
     }
 }

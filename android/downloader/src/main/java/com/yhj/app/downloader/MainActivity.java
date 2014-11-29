@@ -3,6 +3,7 @@ package com.yhj.app.downloader;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +22,16 @@ import java.io.File;
 
 public class MainActivity extends Activity implements DownloadListener {
     private EditText mAddressEdit;
+
+    @Override
+    public void onDownloadComplete(String fileName, String fileType) {
+        this.mStatus.setText(R.string.download_complete);
+    }
+
     private TextView mProgressText;
     private TextView mFilename;
     private TextView mFilesize;
+    private TextView mStatus;
     private ProgressBar mProgressBar;
     private Button mDownloadBtn;
     private Button mCancelBtn;
@@ -37,6 +45,7 @@ public class MainActivity extends Activity implements DownloadListener {
         this.mProgressText = (TextView) this.findViewById(R.id.tv_progress);
         this.mFilename = (TextView) this.findViewById(R.id.tv_filename);
         this.mFilesize = (TextView) this.findViewById(R.id.tv_filesize);
+        this.mStatus = (TextView) this.findViewById(R.id.tv_status);
         this.mDownloadBtn = (Button) this.findViewById(R.id.btn_download);
         this.mCancelBtn = (Button) this.findViewById(R.id.btn_cancel);
         this.mProgressBar = (ProgressBar) this.findViewById(R.id.progress);
@@ -44,7 +53,7 @@ public class MainActivity extends Activity implements DownloadListener {
         this.mDownloadBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Downloader.get().createTask(5,mAddressEdit.getText().toString(),"aaa.apk",MainActivity.this);
+                Downloader.get().createTask(16,mAddressEdit.getText().toString(),"aaa.apk",MainActivity.this);
             }
         });
     }
@@ -81,12 +90,21 @@ public class MainActivity extends Activity implements DownloadListener {
     @Override
     public void onGetFileSizeComplete(long fileSize, String fileName, String fileType) {
         this.mFilesize.setText(fileSize + "bytes");
+        this.mFilename.setText(fileName);
     }
 
     @Override
     public void onDownload(long fileSize, long completeSize, String savePath, String saveName) {
-        mProgressBar.setProgress((int)(((double)completeSize / fileSize) * 100));
-        mProgressText.setText((int)(((double)completeSize / fileSize) * 100) + "%");
+        if (fileSize != completeSize) {
+            this.mStatus.setText(R.string.downloading);
+        }
+        Log.e("fileSize",fileSize + "");
+        Log.e("completeSize", completeSize + "");
+        double c = completeSize;
+        double f = fileSize;
+        int per = (int)((c / f) * 100);
+        mProgressBar.setProgress(per);
+        mProgressText.setText(per + "%");
     }
 
     @Override

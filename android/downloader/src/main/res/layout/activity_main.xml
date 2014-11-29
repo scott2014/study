@@ -23,14 +23,14 @@
             android:text="文件名称"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:id="@+id/tv_filename"/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="android.apk"
             android:textSize="18sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            android:id="@+id/tv_filename"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,20 +43,20 @@
             android:text="文件尺寸"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:id="@+id/tv_filesize"/>
+            />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="10203020bytes"
             android:textSize="18sp"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black"
+            android:id="@+id/tv_filesize"/>
     </LinearLayout>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="https://www.jtjr99.com/downloads/Jyb.latest.apk"
+        android:text="http://music.baidu.com/cms/BaiduMusic-xiazaiye.apk"
         android:id="@+id/et_address"
         />
     <ProgressBar
@@ -71,9 +71,23 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:text="10%"
         android:gravity="right"
         android:id="@+id/tv_progress"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:text="@string/download_status"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:id="@+id/tv_status"/>
 
     <Button
         android:layout_width="match_parent"
